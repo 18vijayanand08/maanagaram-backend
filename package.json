@@ -1,7 +1,6 @@
 {
   "name": "maanagarambackend",
   "version": "1.0.0",
-  "description": "Maanagaram FiveM Backend API",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
