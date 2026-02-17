@@ -1,44 +1,44 @@
-const express = require("express")
-const cors = require("cors")
-const axios = require("axios")
+const express = require("express");
+const cors = require("cors");
+const axios = require("axios");
 
-const app = express()
-const PORT = process.env.PORT || 5000
+const app = express();
 
-app.use(cors())
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
 
-// Root test route
+const PORT = process.env.PORT || 5000;
+
+/* ROOT ROUTE */
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀")
-})
+  res.send("Maanagaram Backend is Running 🚀");
+});
 
-// Fetch FiveM players
+/* SERVER STATUS ROUTE */
 app.get("/api/server-status", async (req, res) => {
   try {
     const response = await axios.get(
       "http://148.113.25.251:30120/players.json"
-    )
+    );
 
-    const players = response.data
+    const players = response.data;
 
     res.json({
-      online: true,
+      success: true,
       count: players.length,
-      players: players
-    })
-
+      players: players.map((p) => ({
+        id: p.id,
+        name: p.name,
+      })),
+    });
   } catch (error) {
-    console.error(error.message)
-
     res.status(500).json({
-      online: false,
-      count: 0,
-      players: []
-    })
+      success: false,
+      message: "Failed to fetch players",
+    });
   }
-})
+});
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+  console.log(`Server running on port ${PORT}`);
+});
