@@ -9,6 +9,9 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
+// FiveM Players JSON URL
+const FIVEM_URL = "http://148.113.25.251:30120/players.json";
+
 /* ROOT ROUTE */
 app.get("/", (req, res) => {
   res.send("Maanagaram Backend is Running 🚀");
@@ -17,14 +20,15 @@ app.get("/", (req, res) => {
 /* SERVER STATUS ROUTE */
 app.get("/api/server-status", async (req, res) => {
   try {
-    const response = await axios.get(
-      "http://148.113.25.251:30120/players.json"
-    );
+    const response = await axios.get(FIVEM_URL, {
+      timeout: 2000, // Prevents long waiting when server is down
+    });
 
-    const players = response.data;
+    const players = response.data || [];
 
-    res.json({
+    return res.json({
       success: true,
+      online: true,
       count: players.length,
       players: players.map((p) => ({
         id: p.id,
@@ -32,9 +36,13 @@ app.get("/api/server-status", async (req, res) => {
       })),
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch players",
+    // 🔥 IMPORTANT: DO NOT RETURN 500
+    // Always return 200 JSON so frontend never shows error in console.
+    return res.json({
+      success: true,
+      online: false,
+      count: 0,
+      players: [],
     });
   }
 });
